@@ -1,0 +1,13 @@
+{
+	"name": "post_todos",
+	"methods": [
+		"POST"
+	],
+	"timeout": 1000,
+	"folders": [
+		"todos"
+	],
+	"vars": {
+		"a": "b"
+	}
+}

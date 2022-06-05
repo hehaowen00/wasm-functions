@@ -1,0 +1,13 @@
+{
+	"name": "delete_todos",
+	"methods": [
+		"DELETE"
+	],
+	"timeout": 1000,
+	"folders": [
+		"todos"
+	],
+	"vars": {
+		"a": "b"
+	}
+}

@@ -1,0 +1,13 @@
+{
+	"name": "get_todos",
+	"methods": [
+		"GET"
+	],
+	"timeout": 1000,
+	"folders": [
+		"todos"
+	],
+	"vars": {
+		"a": "b"
+	}
+}
