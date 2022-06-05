@@ -7,24 +7,41 @@ import (
 	"time"
 )
 
-const S1 string = "INSERT INTO functions (name) VALUES (?)"
+const S1 string = `INSERT INTO functions (name)
+VALUES (?)`
+
 const S2 string = "SELECT id, name FROM functions"
+
 const S3 string = `SELECT timeout FROM configs
 WHERE id = ?`
+
 const S4 string = `SELECT http.method FROM http
 JOIN methods ON http.id = methods.method
 WHERE methods.id = ?`
-const S5 string = "INSERT INTO folders (label) VALUES (?)"
-const S6 string = "SELECT id FROM folders WHERE label = ?"
-const S7 string = "INSERT INTO configs (id, timeout, config) VALUES (?, ?, ?)"
+
+const S5 string = `INSERT INTO folders (label)
+VALUES (?)`
+
+const S6 string = `SELECT id FROM folders
+WHERE label = ?`
+
+const S7 string = `INSERT INTO configs (id, timeout, config)
+VALUES (?, ?, ?)`
+
 const S8 string = `INSERT INTO methods (id, method)
 VALUES (?, (SELECT  id FROM http WHERE method = ?))`
+
 const S9 string = `SELECT id FROM methods
 WHERE id = ? AND method = (SELECT id FROM http WHERE method = ?)`
+
 const S10 string = `INSERT INTO metrics (function_id, called_at, duration)
 VALUES (?, ?, ?)`
-const S11 string = "SELECT config FROM configs WHERE id = ?"
-const S12 string = "SELECT id FROM folders WHERE label = ?"
+
+const S11 string = `SELECT config FROM configs
+WHERE id = ?`
+
+const S12 string = `SELECT id FROM folders
+WHERE label = ?`
 
 type Transaction struct {
 	tx *sql.Tx
