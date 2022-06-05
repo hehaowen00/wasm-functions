@@ -1,52 +1,60 @@
 package main
 
 import (
-	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
-	"log"
-	"os"
+  "database/sql"
+  _ "github.com/mattn/go-sqlite3"
+  "log"
+  "os"
 )
 
 type Conn struct {
-	db *sql.DB
+  db *sql.DB
 }
 
 func NewConn(db *sql.DB) Conn {
-	return Conn{
-		db,
-	}
+  return Conn{
+    db,
+  }
 }
 
 func (conn *Conn) Start() (*Transaction, error) {
-	tx, err := conn.db.Begin()
-	if err != nil {
-		return nil, err
-	}
+  tx, err := conn.db.Begin()
+  if err != nil {
+    return nil, err
+  }
 
-	inst := Transaction{
-		tx,
-	}
+  inst := Transaction{
+    tx,
+  }
 
-	return &inst, err
+  return &inst, err
 }
 
-func SetupDatabase() *sql.DB {
-	db, err := sql.Open("sqlite3", "app.db")
-	if err != nil {
-		log.Fatal(err)
-	}
+func SetupDatabase(path string) *sql.DB {
+  var runSchema bool
 
-	bytes, err := os.ReadFile("./schema.sql")
-	if err != nil {
-		log.Fatal(err)
-	}
+  if _, err := os.Stat(path); err != nil {
+    runSchema = err == nil
+  }
 
-	schema := string(bytes)
+  db, err := sql.Open("sqlite3", path)
+  if err != nil {
+    log.Fatal(err)
+  }
 
-	_, err = db.Exec(schema)
-	if err != nil {
-		log.Fatal(err)
-	}
+  if runSchema {
+    bytes, err := os.ReadFile("./schema.sql")
+    if err != nil {
+      log.Fatal(err)
+    }
 
-	return db
+    schema := string(bytes)
+
+    _, err = db.Exec(schema)
+    if err != nil {
+      log.Fatal(err)
+    }
+  }
+
+  return db
 }

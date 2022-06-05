@@ -1,9 +1,9 @@
 drop table if exists functions;
 drop table if exists configs;
-drop table if exists methods;
-drop table if exists metrics;
 drop table if exists folders;
 drop table if exists http;
+drop table if exists methods;
+drop table if exists metrics;
 
 create table functions (
   id integer PRIMARY KEY autoincrement,
@@ -22,6 +22,15 @@ create table folders (
   label varchar not null unique
 );
 
+-- simulate enums
+create table http (
+  id integer primary key autoincrement,
+  method varchar unique not null
+);
+
+insert into http (method) values 
+  ("GET"), ("POST"), ("PUT"), ("PATCH"), ("DELETE")
+;
 create table methods (
   id integer PRIMARY KEY,
   method id not null,
@@ -37,12 +46,3 @@ create table metrics (
   foreign key (function_id) references functions (id)
 );
 
--- simulate enums
-create table http (
-  id integer primary key autoincrement,
-  method varchar unique not null
-);
-
-insert into http (method) values 
-  ("GET"), ("POST"), ("PUT"), ("PATCH"), ("DELETE")
-;
