@@ -31,10 +31,10 @@ func (conn *Conn) Start() (*Transaction, error) {
 }
 
 func SetupDatabase(path string) *sql.DB {
-  var runSchema bool
+  var runSchema bool = false
 
-  if _, err := os.Stat(path); err != nil {
-    runSchema = err == nil
+  if _, err := os.Stat(path); os.IsNotExist(err) {
+    runSchema = true
   }
 
   db, err := sql.Open("sqlite3", path)

@@ -29,7 +29,7 @@ func ConfigFromPathOrDefault(path string) (Config, error) {
     config = Config{
       Addr: "127.0.0.1",
       Port: "8080",
-      Db: "./app.db",
+      Db: "./wasm.db",
       Fs:      "./fs",
       Modules: "./modules",
     }
@@ -112,6 +112,7 @@ func (config *FunctionConfig) blob() ConfigBlob {
 }
 
 type ConfigBlob struct {
+  timeout int64
   Folders []string          `json:"folders"`
   Vars    map[string]string `json:"vars"`
 }
