@@ -144,6 +144,8 @@ func main() {
 
   configInstance = &config
 
+  moduleCache = make(map[string][]byte)
+
   addr := config.Addr + ":" + config.Port
   db := SetupDatabase(configInstance.Db)
 

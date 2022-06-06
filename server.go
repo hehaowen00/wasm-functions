@@ -1,15 +1,14 @@
 package main
 
 import (
-  "encoding/json"
-  "fmt"
-  "github.com/gorilla/mux"
+	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
   "io"
   "log"
   "net/http"
   "os"
-  "path"
-  "time"
+	"path"
 )
 
 type Server struct {
@@ -138,6 +137,7 @@ func (s *Server) handler(w http.ResponseWriter, req *http.Request) {
 
   tx, err := s.conn.Start()
   if err != nil {
+    log.Println(err)
     w.WriteHeader(http.StatusInternalServerError)
     w.Write([]byte(err.Error()))
     return
@@ -146,6 +146,7 @@ func (s *Server) handler(w http.ResponseWriter, req *http.Request) {
   valid, err := tx.CheckMethod(id, req.Method)
   if err != nil || !valid {
     tx.Rollback()
+    log.Println(err)
     w.WriteHeader(http.StatusBadRequest)
     w.Write([]byte("Invalid Function ID"))
     return
@@ -154,6 +155,7 @@ func (s *Server) handler(w http.ResponseWriter, req *http.Request) {
   config, err := tx.GetConfig(id)
   if err != nil {
     tx.Rollback()
+    log.Println(err)
     w.WriteHeader(http.StatusBadRequest)
     w.Write([]byte(err.Error()))
     return
@@ -162,42 +164,49 @@ func (s *Server) handler(w http.ResponseWriter, req *http.Request) {
   folders, err := tx.GetFolders(config.Folders)
   if err != nil {
     tx.Rollback()
+    log.Println(err)
     w.WriteHeader(http.StatusInternalServerError)
     w.Write([]byte(err.Error()))
     return
   }
 
+
   container, err := NewWasmInstance(id, &config, folders, req)
   if err != nil {
+    log.Println(err)
     w.WriteHeader(500)
     json.NewEncoder(w).Encode(err.Error())
     return
   }
 
-  timestamp := time.Now().UTC()
+  // timestamp := time.Now().UTC()
+  timeout := minInt64(config.timeout, 15 * 60 * 1000)
 
-  output, err := container.runModule(config.timeout)
+  output, err := container.runModule(timeout)
   if output == "" && err == nil {
+    log.Println(err)
     w.WriteHeader(http.StatusRequestTimeout)
     w.Write([]byte(err.Error()))
     return
   }
 
+  // elapsed := maxInt64(1, container.Elapsed.Milliseconds())
 
-  elapsed := maxInt64(1, container.Elapsed.Milliseconds())
+  log.Println("execution time (micro):", container.Elapsed.Microseconds())
+  err = tx.Commit()
 
-  log.Println("execution time:", elapsed)
-
+  /*
   err = tx.AddMetric(id, timestamp, elapsed)
   if err != nil {
+    log.Println(err)
     w.WriteHeader(http.StatusInternalServerError)
     w.Write([]byte(err.Error()))
     return
   }
-
-  err = tx.Commit()
+  */
 
   if err != nil {
+    log.Println(err)
     w.WriteHeader(500)
     w.Write([]byte(err.Error()))
     return
@@ -205,6 +214,13 @@ func (s *Server) handler(w http.ResponseWriter, req *http.Request) {
 
   conn := GetConn(req)
   conn.Write([]byte(output))
+}
+
+func minInt64(a, b int64) int64 {
+  if a < b {
+    return a
+  }
+  return b
 }
 
 func maxInt64(a, b int64) int64 {
