@@ -42,4 +42,3 @@ Due to limitations in compilation, only the main function can be called.
 In order to have more than one function exported in Rust, crates need to be compiled as a library
 using `crate-type = ["cdylib"]`. This is currently not possible with rusqlite and/or 
 sqlite-vfs.
-
